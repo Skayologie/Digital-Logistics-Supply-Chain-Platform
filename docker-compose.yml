@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: management
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: managementUsers
+    ports:
+      - "5431:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - UsersNetwork
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  UsersNetwork:
+    driver: bridge
