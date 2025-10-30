@@ -1,15 +1,20 @@
 package com.project.supplychain.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Setter
 @Getter
 @Entity
@@ -25,13 +30,13 @@ public class Product {
     private BigDecimal profit;
 
     @OneToMany(mappedBy = "product", cascade = {CascadeType.ALL,CascadeType.MERGE}, orphanRemoval = true)
-    private ArrayList<Inventory> inventories;
+    private List<Inventory> inventories = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = {CascadeType.ALL,CascadeType.MERGE}, orphanRemoval = true)
-    private ArrayList<SalesOrderLine> salesOrderLines;
+    private List<SalesOrderLine> salesOrderLines = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = {CascadeType.ALL,CascadeType.MERGE}, orphanRemoval = true)
-    private ArrayList<PurchaseOrderLine> purchaseOrderLines;
+    private List<PurchaseOrderLine> purchaseOrderLines = new ArrayList<>();
 
 
 }

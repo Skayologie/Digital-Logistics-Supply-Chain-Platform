@@ -1,11 +1,9 @@
 package com.project.supplychain.controller;
 
 
-import com.project.supplychain.DTOs.usersDTOs.ClientDTO;
 import com.project.supplychain.DTOs.usersDTOs.UserLoginDTO;
 import com.project.supplychain.DTOs.usersDTOs.UserRegisterDTO;
 import com.project.supplychain.exceptions.BadRequestException;
-import com.project.supplychain.mappers.usersMappers.ClientMapper;
 import com.project.supplychain.mappers.usersMappers.UserMapper;
 import com.project.supplychain.models.user.Client;
 import com.project.supplychain.models.user.User;
