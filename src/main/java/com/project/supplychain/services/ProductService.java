@@ -39,6 +39,13 @@ public class ProductService {
         result.put("product", productMapper.toDTO(product));
         return result;
     }
+    public HashMap<String, Object> getProductBySku(String sku) {
+        Product product = productRepository.findBySku(sku)
+                .orElseThrow(() -> new BadRequestException("Product not found"));
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("product", productMapper.toDTO(product));
+        return result;
+    }
 
     public HashMap<String, Object> listProducts() {
         List<ProductDTO> products = productRepository.findAll()
