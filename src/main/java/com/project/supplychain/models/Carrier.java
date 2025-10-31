@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -28,5 +29,5 @@ public class Carrier {
     private CarrierStatus status;
 
     @OneToMany(mappedBy = "carrier", cascade = {CascadeType.ALL,CascadeType.MERGE}, orphanRemoval = true)
-    private ArrayList<Shipment> shipments;
+    private List<Shipment> shipments = new ArrayList<>();
 }
