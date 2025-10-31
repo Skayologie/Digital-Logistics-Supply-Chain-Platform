@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -24,7 +25,7 @@ public class Inventory {
     private Warehouse warehouse;
 
     @OneToMany(mappedBy = "inventory", cascade = {CascadeType.ALL,CascadeType.MERGE}, orphanRemoval = true)
-    private ArrayList<InventoryMovement> inventoryMovements;
+    private List<InventoryMovement> inventoryMovements = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "product_id")
