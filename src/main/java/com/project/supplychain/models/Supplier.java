@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -20,5 +21,5 @@ public class Supplier {
     private String contactInfo;
 
     @OneToMany(mappedBy = "supplier", cascade = {CascadeType.ALL,CascadeType.MERGE}, orphanRemoval = true)
-    private ArrayList<PurchaseOrder> purchaseOrders;
+    private List<PurchaseOrder> purchaseOrders = new ArrayList<>();
 }
