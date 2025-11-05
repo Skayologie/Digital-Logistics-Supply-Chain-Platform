@@ -29,6 +29,9 @@ public class PurchaseOrderLineDTO {
     private Integer quantity;
 
     @NotNull(message = "Unit price is required")
-    @DecimalMin(value = "0.0", inclusive = true, message = "Unit price must be >= 0")
+    @DecimalMin(value = "0.0", message = "Unit price must be >= 0")
     private BigDecimal unitPrice;
+
+    @NotNull(message = "inventoryId is required")
+    private UUID inventoryId;
 }

@@ -1,11 +1,15 @@
 package com.project.supplychain.services;
 
+import com.project.supplychain.DTOs.inventoryMovementDTOs.InventoryMovementDTO;
 import com.project.supplychain.DTOs.purchaseOrderLineDTOs.PurchaseOrderLineDTO;
+import com.project.supplychain.enums.MovementType;
 import com.project.supplychain.exceptions.BadRequestException;
 import com.project.supplychain.mappers.PurchaseOrderLineMapper;
+import com.project.supplychain.models.Inventory;
 import com.project.supplychain.models.Product;
 import com.project.supplychain.models.PurchaseOrder;
 import com.project.supplychain.models.PurchaseOrderLine;
+import com.project.supplychain.repositories.InventoryRepository;
 import com.project.supplychain.repositories.ProductRepository;
 import com.project.supplychain.repositories.PurchaseOrderLineRepository;
 import com.project.supplychain.repositories.PurchaseOrderRepository;
@@ -31,9 +35,16 @@ public class PurchaseOrderLineService {
     @Autowired
     private PurchaseOrderLineMapper purchaseOrderLineMapper;
 
+
+    @Autowired
+    private InventoryRepository inventoryRepository;
+
     public HashMap<String, Object> create(PurchaseOrderLineDTO dto) {
         PurchaseOrder order = purchaseOrderRepository.findById(dto.getPurchaseOrderId())
                 .orElseThrow(() -> new BadRequestException("Purchase order not found"));
+        Inventory inventory = inventoryRepository.findById(dto.getInventoryId())
+                .orElseThrow(() -> new BadRequestException("Inventory not found"));
+
         switch (order.getStatus()) {
             case CREATED, APPROVED -> {
                 // allowed
@@ -49,6 +60,7 @@ public class PurchaseOrderLineService {
         line.setId(null);
         line.setPurchaseOrder(order);
         line.setProduct(product);
+        line.setInventory(inventory);
         if (line.getUnitPrice() == null) {
             line.setUnitPrice(product.getOriginalPrice());
         }

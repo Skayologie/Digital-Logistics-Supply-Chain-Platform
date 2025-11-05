@@ -2,11 +2,13 @@ package com.project.supplychain.services;
 
 import com.project.supplychain.DTOs.inventoryMovementDTOs.InventoryMovementDTO;
 import com.project.supplychain.DTOs.purchaseOrderDTOs.PurchaseOrderDTO;
+import com.project.supplychain.enums.MovementType;
 import com.project.supplychain.enums.PurchaseOrderStatus;
 import com.project.supplychain.exceptions.BadRequestException;
 import com.project.supplychain.mappers.PurchaseOrderMapper;
 import com.project.supplychain.mappers.PurchaseOrderLineMapper;
 import com.project.supplychain.models.PurchaseOrder;
+import com.project.supplychain.models.PurchaseOrderLine;
 import com.project.supplychain.models.Supplier;
 import com.project.supplychain.models.user.User;
 import com.project.supplychain.models.user.WarehouseManager;
@@ -189,6 +191,20 @@ public class PurchaseOrderService {
         if (existing.getStatus() != PurchaseOrderStatus.APPROVED) {
             throw new BadRequestException("Only APPROVED orders can be received");
         }
+
+        List<PurchaseOrderLine> purchaseOrderLines = existing.getPurchaseOrderLines();
+        for(PurchaseOrderLine purchaseOrderLine : purchaseOrderLines){
+            InventoryMovementDTO inventoryMovementDTO = InventoryMovementDTO
+                    .builder()
+                    .type(MovementType.INBOUND)
+                    .quantity(purchaseOrderLine.getQuantity())
+                    .inventoryId(purchaseOrderLine.getInventory().getId())
+                    .build();
+            inventoryMovementService.create(inventoryMovementDTO);
+        }
+
+
+
         existing.setStatus(PurchaseOrderStatus.RECEIVED);
         PurchaseOrder saved = purchaseOrderRepository.save(existing);
         HashMap<String, Object> result = new HashMap<>();

@@ -1,8 +1,13 @@
 package com.project.supplychain.mappers;
 
 import com.project.supplychain.DTOs.purchaseOrderLineDTOs.PurchaseOrderLineDTO;
+import com.project.supplychain.models.Inventory;
 import com.project.supplychain.models.PurchaseOrderLine;
+import com.project.supplychain.services.InventoryService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Component
 public class PurchaseOrderLineMapper {
@@ -15,6 +20,7 @@ public class PurchaseOrderLineMapper {
                 .productId(entity.getProduct() != null ? entity.getProduct().getId() : null)
                 .quantity(entity.getQuantity())
                 .unitPrice(entity.getUnitPrice())
+                .inventoryId(entity.getInventory().getId())
                 .build();
     }
 
@@ -24,7 +30,7 @@ public class PurchaseOrderLineMapper {
         entity.setId(dto.getId());
         entity.setQuantity(dto.getQuantity());
         entity.setUnitPrice(dto.getUnitPrice());
-        // relations set in service
+
         return entity;
     }
 }
