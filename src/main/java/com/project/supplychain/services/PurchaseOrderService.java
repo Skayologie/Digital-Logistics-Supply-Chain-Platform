@@ -1,9 +1,11 @@
 package com.project.supplychain.services;
 
+import com.project.supplychain.DTOs.inventoryMovementDTOs.InventoryMovementDTO;
 import com.project.supplychain.DTOs.purchaseOrderDTOs.PurchaseOrderDTO;
 import com.project.supplychain.enums.PurchaseOrderStatus;
 import com.project.supplychain.exceptions.BadRequestException;
 import com.project.supplychain.mappers.PurchaseOrderMapper;
+import com.project.supplychain.mappers.PurchaseOrderLineMapper;
 import com.project.supplychain.models.PurchaseOrder;
 import com.project.supplychain.models.Supplier;
 import com.project.supplychain.models.user.User;
@@ -34,6 +36,13 @@ public class PurchaseOrderService {
     @Autowired
     private PurchaseOrderMapper purchaseOrderMapper;
 
+    @Autowired
+    private PurchaseOrderLineMapper purchaseOrderLineMapper;
+
+    @Autowired
+    private InventoryMovementService inventoryMovementService;
+
+
     public HashMap<String, Object> create(PurchaseOrderDTO dto) {
         Supplier supplier = supplierRepository.findById(dto.getSupplierId())
                 .orElseThrow(() -> new BadRequestException("Supplier not found"));
@@ -62,17 +71,40 @@ public class PurchaseOrderService {
         PurchaseOrder po = purchaseOrderRepository.findById(id)
                 .orElseThrow(() -> new BadRequestException("Purchase order not found"));
         HashMap<String, Object> result = new HashMap<>();
-        result.put("purchaseOrder", purchaseOrderMapper.toDTO(po));
+    result.put("purchaseOrder", purchaseOrderMapper.toDTO(po));
+    result.put("POLines", po.getPurchaseOrderLines()
+        .stream()
+        .map(purchaseOrderLineMapper::toDTO)
+        .toList());
+        return result;
+    }
+
+    public HashMap<String, Object> getOPLinesById(UUID id) {
+        PurchaseOrder po = purchaseOrderRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException("Purchase order not found"));
+        HashMap<String, Object> result = new HashMap<>();
+    result.put("POLines", po.getPurchaseOrderLines()
+        .stream()
+        .map(purchaseOrderLineMapper::toDTO)
+        .toList());
         return result;
     }
 
     public HashMap<String, Object> list() {
-        List<PurchaseOrderDTO> list = purchaseOrderRepository.findAll()
+        List<HashMap<String, Object>> listWithLines = purchaseOrderRepository.findAll()
                 .stream()
-                .map(purchaseOrderMapper::toDTO)
+                .map(po -> {
+                    HashMap<String, Object> item = new HashMap<>();
+                    item.put("purchaseOrder", purchaseOrderMapper.toDTO(po));
+                    item.put("POLines", po.getPurchaseOrderLines()
+                            .stream()
+                            .map(purchaseOrderLineMapper::toDTO)
+                            .toList());
+                    return item;
+                })
                 .toList();
         HashMap<String, Object> result = new HashMap<>();
-        result.put("purchaseOrders", list);
+        result.put("purchaseOrders", listWithLines);
         return result;
     }
 

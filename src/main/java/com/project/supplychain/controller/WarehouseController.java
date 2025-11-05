@@ -1,6 +1,7 @@
 package com.project.supplychain.controller;
 
 import com.project.supplychain.DTOs.warehouseDTOs.WarehouseDTO;
+import com.project.supplychain.annotations.RoleRequired;
 import com.project.supplychain.exceptions.BadRequestException;
 import com.project.supplychain.services.WarehouseService;
 import jakarta.validation.Valid;
@@ -18,6 +19,7 @@ public class WarehouseController {
     @Autowired
     private WarehouseService warehouseService;
 
+    @RoleRequired({"ADMIN","WAREHOUSE_MANAGER"})
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody WarehouseDTO dto) {
         try {

@@ -26,7 +26,6 @@ public class PurchaseOrderMapper {
         entity.setStatus(dto.getStatus());
         entity.setCreatedAt(dto.getCreatedAt());
         entity.setExpectedDelivery(dto.getExpectedDelivery());
-        // relations set in service
         return entity;
     }
 }

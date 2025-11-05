@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -31,7 +32,7 @@ public class PurchaseOrder {
     private WarehouseManager warehouseManager;
 
     @OneToMany(mappedBy = "purchaseOrder", cascade = {CascadeType.ALL,CascadeType.MERGE}, orphanRemoval = true)
-    private ArrayList<PurchaseOrderLine> purchaseOrderLines;
+    private List<PurchaseOrderLine> purchaseOrderLines;
 
 
 }

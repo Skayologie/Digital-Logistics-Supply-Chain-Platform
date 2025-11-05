@@ -5,7 +5,9 @@ import com.project.supplychain.DTOs.usersDTOs.UserRegisterDTO;
 import com.project.supplychain.JWT.JWT;
 import com.project.supplychain.exceptions.BadRequestException;
 import com.project.supplychain.mappers.usersMappers.UserMapper;
+import com.project.supplychain.models.user.Client;
 import com.project.supplychain.models.user.User;
+import com.project.supplychain.models.user.WarehouseManager;
 import com.project.supplychain.repositories.AuthRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.validation.ConstraintViolation;
@@ -75,19 +77,33 @@ public class AuthService {
                 throw new BadRequestException(errorMsg);
             }
             if(!authRepository.existsByEmailIgnoreCase(userDto.getEmail())){
-                throw new BadRequestException(" The email not exist please try the signup first .");
+                throw new BadRequestException("The email not exist please try the signup first .");
             }
             User user = authRepository.getByEmail(userDto.getEmail());
             if(!passwordEncoder.matches(userDto.getPassword(),user.getPassword())){
                 throw new BadRequestException("The password is incorrect use a valid password for this email .");
             }
+            if(user instanceof WarehouseManager){
+                HashMap<String , Object> response = new HashMap<>();
+                response.put("message","You logged successfully to the account .");
+                response.put("status",true);
+                response.put("token",jwt.generateToken(user));
+                return response;
+            } else if (user instanceof Client) {
+                HashMap<String , Object> response = new HashMap<>();
+                response.put("message","You logged successfully to the account .");
+                response.put("status",true);
+                response.put("token",jwt.generateToken(user));
+                return response;
+            } else{
+                HashMap<String , Object> response = new HashMap<>();
+                response.put("message","You logged successfully to the account .");
+                response.put("status",true);
+                response.put("token",jwt.generateToken(user));
+                return response;
+            }
 
 
-            HashMap<String , Object> response = new HashMap<>();
-            response.put("message","You logged successfully to the account .");
-            response.put("status",true);
-            response.put("token",jwt.generateToken(user));
-            return response;
 
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
@@ -98,9 +114,25 @@ public class AuthService {
         HashMap<String , Object> response = new HashMap<>();
         Claims claims = jwt.extractAllClaims(token);
         String email = claims.getSubject();
-        response.put("message","You logged successfully to the account .");
-        response.put("status",true);
-        response.put("email",email);
+        User user = authRepository.getByEmail(email);
+
+        if(user instanceof WarehouseManager){
+            response.put("message","You logged successfully to the account .");
+            response.put("status",true);
+            response.put("email",email);
+            response.put("role",((WarehouseManager) user).getRole());
+        } else if (user instanceof Client) {
+            response.put("message","You logged successfully to the account .");
+            response.put("status",true);
+            response.put("email",email);
+            response.put("role",((Client) user).getRole());
+        } else{
+            response.put("message","You logged successfully to the account .");
+            response.put("status",true);
+            response.put("email",email);
+            response.put("role",null);
+        }
+
         return response;
     }
 }
