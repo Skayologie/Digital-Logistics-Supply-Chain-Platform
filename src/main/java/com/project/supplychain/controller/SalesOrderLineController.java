@@ -48,6 +48,16 @@ public class SalesOrderLineController {
         }
     }
 
+    @GetMapping("/{id}/OS")
+    public ResponseEntity<?> getbyOS(@PathVariable UUID id) {
+        try {
+            HashMap<String, Object> result = salesOrderLineService.getSalesOrderLinesBySO(id);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable UUID id, @Valid @RequestBody SalesOrderLineDTO dto) {
         try {

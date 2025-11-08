@@ -4,10 +4,12 @@ import com.project.supplychain.DTOs.salesOrderDTOs.SalesOrderDTO;
 import com.project.supplychain.enums.OrderStatus;
 import com.project.supplychain.exceptions.BadRequestException;
 import com.project.supplychain.mappers.SalesOrderMapper;
+import com.project.supplychain.models.Inventory;
 import com.project.supplychain.models.SalesOrder;
 import com.project.supplychain.models.Warehouse;
 import com.project.supplychain.models.user.Client;
 import com.project.supplychain.models.user.User;
+import com.project.supplychain.repositories.InventoryRepository;
 import com.project.supplychain.repositories.SalesOrderRepository;
 import com.project.supplychain.repositories.UserRepository;
 import com.project.supplychain.repositories.WarehouseRepository;
@@ -33,6 +35,9 @@ public class SalesOrderService {
     private WarehouseRepository warehouseRepository;
 
     @Autowired
+    private InventoryRepository inventoryRepository;
+
+    @Autowired
     private SalesOrderMapper salesOrderMapper;
 
     public HashMap<String, Object> create(SalesOrderDTO dto) {
@@ -48,9 +53,11 @@ public class SalesOrderService {
             throw new BadRequestException("Provided user is not a client");
         }
 
+
         Warehouse warehouse = warehouseRepository.getById(dto.getWarehouseId());
+
         entity.setClient(client);
-        entity.setStatus(OrderStatus.CREATED);
+        entity.setStatus(OrderStatus.RESERVED);
         entity.setCreatedAt(LocalDateTime.now());
         entity.setWarehouse(warehouse);
 
