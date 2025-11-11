@@ -37,7 +37,7 @@ public class CarrierService {
 
     public HashMap<String, Object> get(UUID id) {
         Carrier found = carrierRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException("Carrier not found on this"));
+                .orElseThrow(() -> new BadRequestException("Carrier not found"));
         HashMap<String, Object> result = new HashMap<>();
         result.put("carrier", carrierMapper.toDTO(found));
         return result;
