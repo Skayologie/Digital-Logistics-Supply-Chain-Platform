@@ -2,11 +2,7 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven 3'   // make sure it matches your Jenkins tool name
-    }
-
-    environment {
-        SONARQUBE = 'SonarQubeServer' // must match the name in Jenkins → System config
+        maven 'Maven 3'   // Matches Jenkins tool name
     }
 
     stages {
@@ -15,7 +11,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        // Run tests and build the project — this will also trigger JaCoCo coverage
+                        // 'verify' runs tests and generates target/jacoco.exec
                         sh 'mvn clean verify'
                     } catch (e) {
                         error "Maven build failed: ${e.message}"
@@ -29,27 +25,26 @@ pipeline {
                     } else {
                         error "❌ Build succeeded, but no .jar file was found in target/."
                     }
-
-                    // Generate JaCoCo report
-                    echo "📊 Generating JaCoCo coverage report..."
-                    sh 'mvn jacoco:report'
                 }
             }
             post {
                 always {
-                    // Publish JaCoCo results to Jenkins
+                    // Publish JaCoCo results to Jenkins from the .exec file
                     jacoco execPattern: 'target/jacoco.exec',
                             classPattern: 'target/classes',
                             sourcePattern: 'src/main/java',
-                            inclusionPattern: '**/*.class'
+                            inclusionPattern: '**/*.class',
+
+                            minimumInstructionCoverage: '70',
+                            changeBuildStatus: true
                 }
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
+                // This step pulls the server config by name directly
                 withSonarQubeEnv('SonarQubeServer') {
-                    // Analyze code quality with SonarQube
                     sh 'mvn sonar:sonar -Dsonar.projectKey=Digital-Logistics-Supply-Chain-Platform'
                 }
             }
@@ -58,7 +53,7 @@ pipeline {
         stage('Quality Gate') {
             steps {
                 script {
-                    // Wait for SonarQube to finish the analysis and get quality gate status
+                    // Wait for SonarQube to finish and check the gate status
                     timeout(time: 5, unit: 'MINUTES') {
                         waitForQualityGate abortPipeline: true
                     }
