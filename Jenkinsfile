@@ -35,6 +35,8 @@ pipeline {
                             sourcePattern: 'src/main/java',
                             inclusionPattern: '**/*.class',
                             minimumInstructionCoverage: '70',
+                            minimumLineCoverage: '70',
+                            minimumBranchCoverage: '60',
                             changeBuildStatus: true
                 }
             }
@@ -43,8 +45,7 @@ pipeline {
             steps {
                 // This step pulls the server config by name directly
                 withSonarQubeEnv('SonarQubeServer') {
-                    sh 'mvn sonar:sonar -Dsonar.projectKey=Digital-Logistics-Supply-Chain-Platform'
-                }
+                    sh 'mvn sonar:sonar -Dsonar.projectKey=Digital-Logistics-Supply-Chain-Platform -Dsonar.coverage.jacoco.xmlReportPaths=target/jacoco.exec'                }
             }
         }
 
