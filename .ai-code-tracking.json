@@ -429,12 +429,23 @@
       "aiTool": "AI Assistant",
       "detectionMethod": "REALTIME_SPEED_ANALYSIS",
       "lineCount": 52
+    },
+    {
+      "filePath": "S:/Spring Core/Digital Logistics And Supply Chain Platform/src/test/java/com/project/supplychain/DigitalLogisticsAndSupplyChainPlatformApplicationTests.java",
+      "timestamp": 1763318626094,
+      "startOffset": 130,
+      "endOffset": 210,
+      "codeContent": "import org.springframework.test.context.ActiveProfiles;\n\n@ActiveProfiles(\"test\")",
+      "aiProbability": 90,
+      "aiTool": "AI Assistant",
+      "detectionMethod": "REALTIME_SPEED_ANALYSIS",
+      "lineCount": 3
     }
   ],
   "toolStats": {
     "AI Assistant": {
-      "usageCount": 39,
-      "totalLines": 1355
+      "usageCount": 40,
+      "totalLines": 1358
     }
   }
 }

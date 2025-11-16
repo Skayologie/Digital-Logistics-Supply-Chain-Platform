@@ -11,8 +11,8 @@ pipeline {
             steps {
                 script {
                     try {
-                        // 'verify' runs tests and generates target/jacoco.exec
                         sh 'mvn clean verify'
+                        sh 'mvn jacoco:report'
                     } catch (e) {
                         error "Maven build failed: ${e.message}"
                     }
