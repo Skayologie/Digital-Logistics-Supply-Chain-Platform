@@ -39,7 +39,6 @@ pipeline {
                 }
             }
         }
-
         stage('SonarQube Analysis') {
             steps {
                 // This step pulls the server config by name directly
