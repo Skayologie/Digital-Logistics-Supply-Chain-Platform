@@ -19,7 +19,6 @@ public class WarehouseController {
     @Autowired
     private WarehouseService warehouseService;
 
-    @RoleRequired({"ADMIN","WAREHOUSE_MANAGER"})
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody WarehouseDTO dto) {
         try {
