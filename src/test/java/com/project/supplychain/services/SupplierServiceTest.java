@@ -32,9 +32,12 @@ class SupplierServiceTest {
 
     @Test
     void createSupplier_success_returnsDto() {
-        SupplierDTO dto = new SupplierDTO(); dto.setName("S1");
+        SupplierDTO dto = new SupplierDTO();
+        dto.setName("S1");
         Supplier entity = new Supplier();
-        Supplier saved = new Supplier(); saved.setId(UUID.randomUUID()); saved.setName("S1");
+        Supplier saved = new Supplier();
+        saved.setId(UUID.randomUUID());
+        saved.setName("S1");
 
         when(supplierMapper.toEntity(dto)).thenReturn(entity);
         when(supplierRepository.save(entity)).thenReturn(saved);
