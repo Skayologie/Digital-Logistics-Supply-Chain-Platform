@@ -43,12 +43,18 @@ public class ShipmentService {
         Carrier carrier = carrierRepository.findById(dto.getCarrierId())
                 .orElseThrow(() -> new BadRequestException("Carrier not found"));
 
+        if(order.getStatus() != OrderStatus.RESERVED){
+            throw new BadRequestException("The Order is not reserved !");
+        }
+
         if (entity.getStatus() == null) entity.setStatus(ShipmentStatus.PLANNED);
         if (entity.getPlannedDate() == null) entity.setPlannedDate(LocalDateTime.now());
-
+        order.setStatus(OrderStatus.SHIPPED);
+        order.setShippedAt(LocalDateTime.now());
         entity.setSalesOrder(order);
         entity.setCarrier(carrier);
-
+        entity.setShippedDate(LocalDateTime.now());
+        order.setShipment(entity);
         Shipment saved = shipmentRepository.save(entity);
         HashMap<String, Object> result = new HashMap<>();
         result.put("message", "Shipment created successfully");
@@ -104,7 +110,6 @@ public class ShipmentService {
         if (shipment.getStatus() != ShipmentStatus.PLANNED) {
             throw new BadRequestException("Only PLANNED shipments can be shipped");
         }
-        // Validate carrier constraints before shipping
         Carrier carrier = shipment.getCarrier();
         if (carrier == null) {
             throw new BadRequestException("Shipment has no carrier assigned");

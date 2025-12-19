@@ -1,7 +1,11 @@
 package com.project.supplychain.config;
 
+import com.project.supplychain.filters.JwtAuthenticationFilter;
+import com.project.supplychain.security.CustomAccessDeniedHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -13,10 +17,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    @Autowired
+    private JwtAuthenticationFilter jwtFilter;
+
+    @Autowired
+    private CustomAccessDeniedHandler customAccessDeniedHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -50,30 +60,61 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.disable())
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-                .httpBasic(Customizer.withDefaults())
-                .logout(logout -> logout
-                        .logoutUrl("/api/Auth/Logout")
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
-                        .logoutSuccessHandler((request, response, authentication) -> {
-                            response.setContentType("application/json");
-                            response.setCharacterEncoding("UTF-8");
-                            response.setStatus(200);
-                            response.getWriter().write("{\"message\":\"Logged out successfully\"}");
-                        })
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(ex -> ex
+                        .accessDeniedHandler(customAccessDeniedHandler)
                 )
                 .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers("/api/salesOrders/**").permitAll()
+                        //Auth
+                        .requestMatchers("/api/Auth/**").permitAll()
 
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        //Inventory
+                        .requestMatchers(HttpMethod.GET,"/api/inventories/**").hasRole("ADMIN")
+                        .requestMatchers("/api/inventories/**").hasRole("WAREHOUSE_MANAGER")
+
+                        //WareHouse
+                        .requestMatchers(HttpMethod.GET,"/api/warehouses/**").hasRole("WAREHOUSE_MANAGER")
+                        .requestMatchers(HttpMethod.PUT,"/api/warehouses/**").hasRole("WAREHOUSE_MANAGER")
+                        .requestMatchers("/api/warehouses/**").hasRole("ADMIN")
+
+                        //Inventory Movements
+                        .requestMatchers(HttpMethod.GET,"/api/inventoryMovements/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/api/inventoryMovements/**").hasRole("WAREHOUSE_MANAGER")
+                        .requestMatchers(HttpMethod.POST,"/api/inventoryMovements/**").hasRole("WAREHOUSE_MANAGER")
+
+                        //Products
+                        .requestMatchers(HttpMethod.GET,"/api/products/**").hasAnyRole("WAREHOUSE_MANAGER","CLIENT")
                         .requestMatchers("/api/products/**").hasRole("ADMIN")
 
-                        .requestMatchers("/api/inventory/**").hasAnyRole("ADMIN", "WAREHOUSE_MANAGER")
-                        .requestMatchers("/api/shipments/**").hasAnyRole("ADMIN", "WAREHOUSE_MANAGER")
+                        //Sales Order
+                        .requestMatchers(HttpMethod.GET,"/api/salesOrders/**").hasAnyRole("WAREHOUSE_MANAGER","ADMIN","CLIENT")
+                        .requestMatchers(HttpMethod.POST,"/api/salesOrders/**").hasRole("CLIENT")
 
-                        .requestMatchers("/api/orders/**").hasAnyRole("ADMIN", "WAREHOUSE_MANAGER", "CLIENT")
+                        //Sales Order LINE
+                        .requestMatchers(HttpMethod.GET,"/api/salesOrderLines/**").hasAnyRole("WAREHOUSE_MANAGER","ADMIN","CLIENT")
+                        .requestMatchers(HttpMethod.POST,"/api/salesOrderLines/**").hasRole("CLIENT")
+
+                        //Supplier
+                        .requestMatchers("/api/suppliers/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/api/salesOrderLines/**").hasAnyRole("WAREHOUSE_MANAGER")
+
+                        //Purchase Order
+                        .requestMatchers(HttpMethod.GET,"/api/purchaseOrders/**").hasAnyRole("ADMIN","WAREHOUSE_MANAGER")
+                        .requestMatchers(HttpMethod.POST,"/api/purchaseOrders/**").hasRole("WAREHOUSE_MANAGER")
+
+                        //Purchase Order LINE
+                        .requestMatchers(HttpMethod.GET,"/api/purchaseOrderLines/**").hasAnyRole("ADMIN","WAREHOUSE_MANAGER")
+                        .requestMatchers(HttpMethod.POST,"/api/purchaseOrderLines/**").hasRole("WAREHOUSE_MANAGER")
+
+                        //Carriers
+                        .requestMatchers("/api/purchaseOrderLines/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/api/purchaseOrderLines/**").hasRole("WAREHOUSE_MANAGER")
+
+                        //Shipment
+                        .requestMatchers(HttpMethod.GET,"/api/shipments/**").hasAnyRole("ADMIN","WAREHOUSE_MANAGER")
+                        .requestMatchers(HttpMethod.POST,"/api/shipments/**").hasRole("WAREHOUSE_MANAGER")
 
                         .anyRequest().authenticated()
                 );

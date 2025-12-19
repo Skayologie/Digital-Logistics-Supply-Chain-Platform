@@ -58,6 +58,7 @@ public class SalesOrderService {
 
         entity.setClient(client);
         entity.setStatus(OrderStatus.RESERVED);
+        entity.setReservedAt(LocalDateTime.now());
         entity.setCreatedAt(LocalDateTime.now());
         entity.setWarehouse(warehouse);
 
