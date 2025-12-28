@@ -23,12 +23,9 @@ public class ProductService {
     @Autowired
     private ProductMapper productMapper;
 
-    private static final Logger log =
-            LoggerFactory.getLogger(ProductService.class);
 
 
     public HashMap<String, Object> createProduct(ProductDTO dto) {
-        log.info("Product service started");
         Product product = productMapper.toEntity(dto);
         product.setId(null);
         Product saved = productRepository.save(product);
@@ -36,7 +33,6 @@ public class ProductService {
         HashMap<String, Object> result = new HashMap<>();
         result.put("message", "Product created successfully");
         result.put("product", productMapper.toDTO(saved));
-        log.info("Product has been created with id {} and name {}", saved.getId(), saved.getName());
         return result;
     }
 

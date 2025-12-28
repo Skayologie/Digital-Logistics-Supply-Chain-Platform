@@ -47,63 +47,6 @@ services:
     networks:
       - LGCNetwork
 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.19.0
-    container_name: elasticsearch
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - http.cors.enabled=true
-      - http.cors.allow-origin=http://localhost:5601
-    ports:
-      - "9200:9200"
-    volumes:
-      - es_data:/usr/share/elasticsearch/data
-    networks:
-      - LGCNetwork
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.19.0
-    container_name: kibana
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-    ports:
-      - "5603:5601"
-    depends_on:
-      - elasticsearch
-    networks:
-      - LGCNetwork
-
-  logstash:
-    image: docker.elastic.co/logstash/logstash:8.19.0
-    container_name: logstash
-    command: logstash -f /etc/logstash/conf.d/logstash.conf
-    volumes:
-      - ./logstash/logstash.conf:/etc/logstash/conf.d/logstash.conf
-    ports:
-      - "5044:5044"
-    environment:
-      - "LS_JAVA_OPTS=-Xmx256m -Xms256m" # Limit memory usage
-      - XPACK_MONITORING_ENABLED=false
-    depends_on:
-      - elasticsearch
-    networks:
-      - LGCNetwork
-
-  filebeat:
-    image: docker.elastic.co/beats/filebeat:8.19.0
-    container_name: filebeat
-    user: root # Required to read docker logs
-    command: filebeat -e --strict.perms=false -c /usr/share/filebeat/filebeat.yml
-    volumes:
-      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
-      - ./logs/app.log:/var/logs/app.log:ro
-    depends_on:
-      - logstash
-    networks:
-      - LGCNetwork
-
 
 volumes:
   postgres_data:
@@ -112,7 +55,6 @@ volumes:
   sonarqube_data:
   sonarqube_extensions:
   sonarqube_logs:
-  es_data:
 
 networks:
   LGCNetwork:
