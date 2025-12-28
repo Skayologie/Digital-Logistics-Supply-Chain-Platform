@@ -6,6 +6,7 @@ import com.project.supplychain.services.SalesOrderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -23,6 +24,8 @@ public class SalesOrderController {
         try {
             HashMap<String, Object> result = salesOrderService.create(dto);
             return ResponseEntity.ok(result);
+        } catch (AccessDeniedException ade) {
+            throw ade;
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
         }
@@ -33,6 +36,8 @@ public class SalesOrderController {
         try {
             HashMap<String, Object> result = salesOrderService.list();
             return ResponseEntity.ok(result);
+        } catch (AccessDeniedException ade) {
+            throw ade;
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
         }
@@ -43,6 +48,8 @@ public class SalesOrderController {
         try {
             HashMap<String, Object> result = salesOrderService.get(id);
             return ResponseEntity.ok(result);
+        } catch (AccessDeniedException ade) {
+            throw ade;
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
         }
@@ -53,6 +60,8 @@ public class SalesOrderController {
         try {
             HashMap<String, Object> result = salesOrderService.update(id, dto);
             return ResponseEntity.ok(result);
+        } catch (AccessDeniedException ade) {
+            throw ade;
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
         }
@@ -63,6 +72,8 @@ public class SalesOrderController {
         try {
             HashMap<String, Object> result = salesOrderService.delete(id);
             return ResponseEntity.ok(result);
+        } catch (AccessDeniedException ade) {
+            throw ade;
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
         }
