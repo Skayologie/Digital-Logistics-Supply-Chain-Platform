@@ -1,0 +1,16 @@
+filebeat.inputs:
+  - type: filestream
+    id: springboot-local-file
+    enabled: true
+    paths:
+      - /var/log/myapp/app.log
+
+processors:
+  - add_fields:
+      target: ""
+      fields:
+        service.name: "supplychain-local"
+        log.source: "springboot-file"
+
+output.logstash:
+  hosts: ["logstash:5044"]

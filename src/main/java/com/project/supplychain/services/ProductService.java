@@ -5,6 +5,8 @@ import com.project.supplychain.exceptions.BadRequestException;
 import com.project.supplychain.mappers.ProductMapper;
 import com.project.supplychain.models.Product;
 import com.project.supplychain.repositories.ProductRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +23,12 @@ public class ProductService {
     @Autowired
     private ProductMapper productMapper;
 
+    private static final Logger log =
+            LoggerFactory.getLogger(ProductService.class);
+
+
     public HashMap<String, Object> createProduct(ProductDTO dto) {
+        log.info("Product service started");
         Product product = productMapper.toEntity(dto);
         product.setId(null);
         Product saved = productRepository.save(product);
@@ -29,6 +36,7 @@ public class ProductService {
         HashMap<String, Object> result = new HashMap<>();
         result.put("message", "Product created successfully");
         result.put("product", productMapper.toDTO(saved));
+        log.info("Product has been created with id {} and name {}", saved.getId(), saved.getName());
         return result;
     }
 
