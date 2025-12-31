@@ -3,14 +3,30 @@ services:
     container_name: keycloak_demo
     image: quay.io/keycloak/keycloak:25.0.5
     ports:
-      - 9090:8080
+      - "9090:8080"
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: password
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://db:5432/keycloak
+      KC_DB_USERNAME: admin
+      KC_DB_PASSWORD: password
+    command: start-dev --import-realm
+    depends_on:
+      - db
     volumes:
-      - keycloak_data:/opt/keycloak/data
-    command:
-      - 'start-dev'
+      # This maps your local JSON file to the import directory inside the container
+      - ./keycloak/logistics-realm.json:/opt/keycloak/data/import/realm.json
+
+  # Assuming you have a DB service defined like this:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    volumes:
+      - keycloak_db:/var/lib/postgresql/data
 
 volumes:
-  keycloak_data:
+  keycloak_db:
