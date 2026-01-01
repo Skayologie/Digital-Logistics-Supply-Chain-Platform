@@ -1,5 +1,6 @@
 package com.project.supplychain.config;
 
+import com.project.supplychain.JWT.JWTConverter;
 import com.project.supplychain.filters.JwtAuthenticationFilter;
 import com.project.supplychain.security.CustomAccessDeniedHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 public class SecurityConfig {
     @Autowired
     private JwtAuthenticationFilter jwtFilter;
+
+    @Autowired
+    private JWTConverter jwtConverter;
 
     @Autowired
     private CustomAccessDeniedHandler customAccessDeniedHandler;
@@ -62,11 +66,17 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.disable())
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .sessionManagement(sm ->
+                        sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                         .accessDeniedHandler(customAccessDeniedHandler)
+                )
+                .oauth2ResourceServer(oauth2 ->
+                        oauth2.jwt(jwt ->
+                                jwt.jwtAuthenticationConverter(jwtConverter)
+                        )
                 )
                 .authorizeHttpRequests(auth -> auth
 
